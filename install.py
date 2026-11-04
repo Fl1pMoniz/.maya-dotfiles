@@ -35,7 +35,7 @@ if a.with_mvim:
     # Run before copying overrides so the saved personal config wins afterward.
     subprocess.run(['bash', str(root / 'bootstrap-mvim.sh'), '--from-installer'], check=True)
 sys.path.insert(0, str(root / 'scripts'))
-from links import backup_root, ensure_link, save_existing
+from links import backup_root, ensure_link, ensure_managed, save_existing
 from kool import repair_dropdown, repair_kitty_config
 from services import archive_conflicts
 from themes import ALIASES, install_profiles
@@ -82,12 +82,7 @@ if not zshrc.is_file() or zshrc.is_symlink() or zshrc.read_text() != loader:
             zshrc.unlink()
     zshrc.write_text(loader)
     zshrc.chmod(0o600)
-for src in (root / 'home').rglob('*'):
-    if src.is_file() and str(src.relative_to(root / "home")) not in ALIASES:
-        ensure_link(src, home / src.relative_to(root / 'home'), home, backup)
-for src in (root / 'color-palette').iterdir():
-    if src.is_file() and ".config/maya-theme/" + src.name not in ALIASES:
-        ensure_link(src, home / '.config/maya-theme' / src.name, home, backup)
+ensure_managed(root, home, backup, ALIASES)
 install_profiles(root, home, backup)
 repair_kitty_config(home, backup)
 subprocess.run([sys.executable, str(home / '.local/bin/maya-lock'), '--prepare'], check=True)

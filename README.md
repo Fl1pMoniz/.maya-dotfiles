@@ -111,13 +111,15 @@ to match only its dedicated terminal class, preventing it from hiding another ap
 during login. KooL's launchers pass `~/.config/hypr/UserConfigs/kitty.conf`
 explicitly; that file is replaced with a small include of `~/.config/kitty/kitty.conf`
 so KooL's Catppuccin include cannot override Maya's colors and notebook background.
-Original scripts and configs are backed up; upstream source trees are not stored
-here.
+Every Maya-managed path is enforced the same way: whatever currently occupies it
+(a KooL file, a distro default, a vendor file or a hand-written config) is backed
+up and replaced with the Maya version. Original scripts and configs are backed up;
+upstream source trees are not stored here.
 
-`maya-dotfiles.path` repairs replaced
-Kitty, Waybar, Rofi, Wofi, SwayNC and Hyprland user-config symlinks. Vendor writes _through_ a symlink
-also change the repo: inspect `git diff` after theme tools. Keep this repo in
-place. Backups live in `~/.local/state/maya-dotfiles/backups/`.
+`maya-dotfiles.path` replaces drifted Maya-managed configs with their repo
+links. Vendor writes _through_ a symlink also change the repo: inspect `git diff`
+after theme tools. Keep this repo in place. Backups live in
+`~/.local/state/maya-dotfiles/backups/`.
 
 ```sh
 # Disable the managed bar and link recovery:

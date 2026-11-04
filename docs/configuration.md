@@ -2,6 +2,9 @@
 
 Installed files are symlinks into `home/`: editing either location changes the
 same file. Reload the application afterward. Run the installer to link new files.
+Every managed path is forced to the Maya version: an existing KooL, distro,
+vendor or custom file is backed up and replaced, not just a file that looks like
+KooL's.
 
 - **Kitty:** `~/.config/kitty/kitty.conf`; paper texture/tint in
   `~/.local/share/kitty-personal/notebook.conf`. The custom Novel theme and notebook

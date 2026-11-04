@@ -12,23 +12,37 @@ def repair_kitty_config(home, backup):
     """Make KooL's explicit kitty --config path load the Maya Kitty config.
 
     KooL's LaunchTerminal.sh and Dropterminal.sh always pass
-    ~/.config/hypr/UserConfigs/kitty.conf. KooL updates also add a Catppuccin
-    include there, which overrides Maya's paper palette (especially the tab bar
-    and borders). Replace that file with a small include of the real config.
+    ~/.config/hypr/UserConfigs/kitty.conf. Whatever currently occupies that path
+    (a KooL Catppuccin config, a distro default or a hand-written file) is
+    backed up and replaced with the Maya include. When a KooL launcher exists
+    but the file does not, create the include so KooL cannot fall back to a
+    different config.
     """
     kool = home / '.config/hypr/UserConfigs/kitty.conf'
     maya = home / '.config/kitty/kitty.conf'
-    if not maya.is_file() or not (kool.exists() or kool.is_symlink()):
+    if not maya.is_file():
         return False
+    launcher = home / '.config/hypr/scripts/LaunchTerminal.sh'
+    dropdown = home / '.config/hypr/scripts/Dropterminal.sh'
+    if not (kool.exists() or kool.is_symlink()):
+        if not (launcher.exists() or dropdown.exists()):
+            return False
+        kool.parent.mkdir(parents=True, exist_ok=True)
+        kool.write_text(KITTY_STUB)
+        return True
     try:
         current = kool.read_text()
     except OSError:
-        return False
+        # A directory or unreadable file is still a conflicting config.
+        current = None
     if current == KITTY_STUB:
         return False
     save_existing(kool, home, backup)
     if kool.is_symlink():
         kool.unlink()
+    elif kool.is_dir():
+        import shutil
+        shutil.rmtree(kool)
     kool.write_text(KITTY_STUB)
     return True
 

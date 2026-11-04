@@ -58,11 +58,20 @@ with tempfile.TemporaryDirectory(prefix='maya-dotfiles-test-') as d:
     assert (units / 'waybar.service.d/env.conf').is_file()
     from kool import KITTY_STUB
     kool_kitty = target / '.config/hypr/UserConfigs/kitty.conf'
-    kool_kitty.write_text(
-        'include ~/.config/hypr/UserConfigs/kitty-themes/Catppuccin-Mocha.conf\n')
+    kool_kitty.write_text('# any current config, not only KooL\nbackground #123456\n')
     run('python3', str(root / 'scripts/restore-managed.py'))
     assert kool_kitty.read_text() == KITTY_STUB
     assert (target / '.config/kitty/kitty.conf').is_symlink()
+    # Any non-Maya config at a managed path is replaced and backed up.
+    btop = target / '.config/btop/btop.conf'
+    btop.unlink()
+    btop.write_text('color_theme = "user-custom"\n')
+    run('python3', str(root / 'scripts/restore-managed.py'))
+    assert btop.is_symlink()
+    assert btop.resolve() == root / 'home/.config/btop/btop.conf'
+    saved = list((target / '.local/state/maya-dotfiles/backups').glob(
+        '*/.config/btop/btop.conf'))
+    assert any(path.read_text() == 'color_theme = "user-custom"\n' for path in saved)
     for src in (root / 'color-palette').iterdir():
         installed = target / '.config/maya-theme' / src.name
         assert installed.is_symlink()

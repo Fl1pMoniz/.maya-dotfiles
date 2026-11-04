@@ -35,6 +35,31 @@ def ensure_link(src, dst, home, backup):
     return True
 
 
+def ensure_managed(root, home, backup, aliases):
+    """Replace every Maya-managed path with its repo link, backing up old files.
+
+    This is intentionally content-agnostic: a KooL file, a distro default, a
+    vendor-generated file or a user's hand-written config is all replaced by the
+    Maya version at the same path. Correct links are left untouched.
+    """
+    waybar_changed = False
+    for src in (root / 'home').rglob('*'):
+        if not src.is_file():
+            continue
+        rel = str(src.relative_to(root / 'home'))
+        if rel in aliases:
+            continue
+        changed = ensure_link(src, home / rel, home, backup)
+        waybar_changed |= changed and rel.startswith('.config/waybar/')
+    for src in (root / 'color-palette').iterdir():
+        if not src.is_file():
+            continue
+        if '.config/maya-theme/' + src.name in aliases:
+            continue
+        ensure_link(src, home / '.config/maya-theme' / src.name, home, backup)
+    return waybar_changed
+
+
 def ensure_alias(src, dst, home, backup):
     """Link to a path without resolving its mode-selection symlink."""
     src = Path(src).absolute()
