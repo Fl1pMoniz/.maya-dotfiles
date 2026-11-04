@@ -1,15 +1,29 @@
 #!/usr/bin/env python3
 """Capture with Hyprshot into memory, then annotate in Swappy; no auto-save."""
+import os
+import shutil
 import subprocess
 import sys
 
+home = os.path.expanduser("~")
+env = dict(os.environ)
+# Hyprland starts keybind commands with a minimal PATH; make user tools visible.
+env["PATH"] = os.pathsep.join(
+    [os.path.join(home, ".local/bin"), env.get("PATH", "")]
+)
+hyprshot = shutil.which("hyprshot", path=env["PATH"]) or os.path.join(
+    home, ".config/hypr/scripts/hyprshot.sh"
+)
+
 capture = subprocess.run(
-    ['hyprshot', '--raw', '--silent', '--clipboard-only', *sys.argv[1:]],
+    [hyprshot, '--raw', '--silent', '--clipboard-only', *sys.argv[1:]],
     stdout=subprocess.PIPE,
+    env=env,
 )
 # This Hyprshot build can return 1 during cleanup after a successful capture.
 # Use the PNG signature to distinguish success from a cancelled selection.
 if capture.stdout.startswith(b'\x89PNG\r\n\x1a\n'):
-    raise SystemExit(subprocess.run(['swappy', '-f', '-'], input=capture.stdout).returncode)
+    swappy = shutil.which("swappy", path=env["PATH"]) or "swappy"
+    raise SystemExit(subprocess.run([swappy, '-f', '-'], input=capture.stdout, env=env).returncode)
 
 raise SystemExit(capture.returncode or 1)
