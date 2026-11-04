@@ -65,6 +65,17 @@ for option, edge in [('status-left', ''), ('status-right', '')]:
 subprocess.run(['tmux', 'set-option', '-g', 'status', 'on'], check=True)
 subprocess.run(['tmux', 'set-option', '-g', 'status-format[0]', base_format], check=True)
 
+# Catppuccin loads after the theme file, so reset the base styles it sets.
+# Without this, status-style keeps Catppuccin's #11111B/#CDD6F4 bar.
+for option, value in {
+    'status-style': f"fg={colors['novel_ink']},bg={background}",
+    'status-left-style': 'default',
+    'status-right-style': 'default',
+    'window-status-style': 'default',
+    'window-status-current-style': 'default',
+}.items():
+    subprocess.run(['tmux', 'set-option', '-g', option, value], check=True)
+
 # Remaining plugin color roles follow the selected palette, without layout changes.
 for option, value in {
     'pane-border-style': f"fg={colors['tmux_aux_surface']}",

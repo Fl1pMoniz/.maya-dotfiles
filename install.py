@@ -36,10 +36,23 @@ if a.with_mvim:
     subprocess.run(['bash', str(root / 'bootstrap-mvim.sh'), '--from-installer'], check=True)
 sys.path.insert(0, str(root / 'scripts'))
 from links import backup_root, ensure_link, save_existing
-from kool import repair_dropdown
+from kool import repair_dropdown, repair_kitty_config
+from services import archive_conflicts
 from themes import ALIASES, install_profiles
 backup = backup_root(home)
 repair_dropdown(home, backup)
+
+
+def write_unit(path, content):
+    """Write a Maya-owned unit, preserving any pre-existing copy in the backup."""
+    if path.is_file() and not path.is_symlink() and path.read_text() == content:
+        return
+    if path.exists() or path.is_symlink():
+        save_existing(path, home, backup)
+        if path.is_symlink():
+            path.unlink()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content)
 # Preserve single-line credential assignments before replacing a pre-existing zshrc.
 # Never print their values or copy them into the repository.
 zshrc = home / '.zshrc'
@@ -76,13 +89,14 @@ for src in (root / 'color-palette').iterdir():
     if src.is_file() and ".config/maya-theme/" + src.name not in ALIASES:
         ensure_link(src, home / '.config/maya-theme' / src.name, home, backup)
 install_profiles(root, home, backup)
+repair_kitty_config(home, backup)
 subprocess.run([sys.executable, str(home / '.local/bin/maya-lock'), '--prepare'], check=True)
 if shutil.which('fc-cache'): subprocess.run(['fc-cache', '-f'], check=True)
 if not a.no_services:
     units = home / '.config/systemd/user'; units.mkdir(parents=True, exist_ok=True)
     restore = units / 'maya-dotfiles-restore.service'
-    restore.write_text('[Unit]\nDescription=Restore Maya paper appearance after vendor updates\n[Service]\nType=oneshot\nExecStart=/usr/bin/python3 "' + str(root / 'scripts/restore-managed.py') + '"\n')
-    (units / 'maya-dotfiles.path').write_text("""[Unit]
+    write_unit(restore, '[Unit]\nDescription=Restore Maya paper appearance after vendor updates\n[Service]\nType=oneshot\nExecStart=/usr/bin/python3 "' + str(root / 'scripts/restore-managed.py') + '"\n')
+    write_unit(units / 'maya-dotfiles.path', """[Unit]
 Description=Protect Maya Waybar and Kitty configuration
 [Path]
 PathChanged=%h/.config
@@ -110,7 +124,7 @@ Unit=maya-dotfiles-restore.service
 WantedBy=default.target
 """)
     restore_script = root / 'scripts/restore-managed.py'
-    (units / 'maya-waybar.service').write_text(f"""[Unit]
+    write_unit(units / 'maya-waybar.service', f"""[Unit]
 Description=Maya Paper Waybar
 After=graphical-session-pre.target
 [Service]
@@ -123,6 +137,9 @@ WantedBy=default.target
 """)
     def ctl(*args, check=True): subprocess.run(['systemctl', '--user', *args], check=check)
     ctl('disable', '--now', 'kitty-notebook.path', check=False)
+    ctl('disable', '--now', 'waybar-watchdog.service', check=False)
+    for conflict in archive_conflicts(home, backup, units):
+        print(f'Archived conflicting Waybar unit: {conflict}')
     ctl('disable', '--now', 'waybar.service', check=False)
     # KooL explicitly starts waybar.service even when it is disabled.
     ensure_link(units / 'maya-waybar.service', units / 'waybar.service', home, backup)

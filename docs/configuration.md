@@ -7,6 +7,8 @@ same file. Reload the application afterward. Run the installer to link new files
   `~/.local/share/kitty-personal/notebook.conf`. The custom Novel theme and notebook
   texture are tracked in this repo. Its Light cream and Dark charcoal backgrounds are `novel_paper` in
   each profile in `color-palette/palette.json`; edit the palette and regenerate.
+  KooL launchers pass `~/.config/hypr/UserConfigs/kitty.conf` explicitly, so that
+  file is kept as an include of the real Maya config instead of a Catppuccin theme.
 - **Wofi:** `~/.config/wofi/config`; edit the shared stylesheet in `styles/wofi.css`
   and regenerate both profiles with `python3 scripts/generate-palette.py`: paper panels, a pink search
   strip, beveled rows and crisp offset shadows. Preview with `wofi --show drun`.

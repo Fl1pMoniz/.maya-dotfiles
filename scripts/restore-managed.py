@@ -3,7 +3,7 @@
 from pathlib import Path
 import subprocess
 from links import backup_root, ensure_link
-from kool import repair_dropdown
+from kool import repair_dropdown, repair_kitty_config
 from themes import ALIASES, install_profiles
 root = Path(__file__).resolve().parents[1]
 home = Path.home()
@@ -24,6 +24,7 @@ for src in (root / 'color-palette').iterdir():
     if src.is_file() and ".config/maya-theme/" + src.name not in ALIASES:
         ensure_link(src, home / '.config/maya-theme' / src.name, home, backup)
 waybar_changed |= install_profiles(root, home, backup)
+repair_kitty_config(home, backup)
 if waybar_changed:
     subprocess.run(['systemctl', '--user', '--no-block', 'try-restart',
                     'maya-waybar.service'], stdout=subprocess.DEVNULL,

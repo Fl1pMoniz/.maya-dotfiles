@@ -34,6 +34,35 @@ with tempfile.TemporaryDirectory(prefix='maya-dotfiles-test-') as d:
     import sys
     sys.path.insert(0, str(root / 'scripts'))
     from themes import ALIASES
+    from services import archive_conflicts
+    units = target / '.config/systemd/user'
+    (units / 'waybar.service.d').mkdir(parents=True)
+    (units / 'waybar.service.d/override.conf').write_text(
+        '[Service]\nExecStart=/usr/bin/waybar -c %h/.config/hypr/waybar/config\n')
+    (units / 'waybar-watchdog.service').write_text('[Service]\nExecStart=/bin/true\n')
+    wants = units / 'graphical-session.target.wants'
+    wants.mkdir()
+    (wants / 'waybar-watchdog.service').symlink_to(units / 'waybar-watchdog.service')
+    service_backup = target / '.local/state/service-backup'
+    conflicts = archive_conflicts(target, service_backup, units)
+    assert conflicts
+    assert not (units / 'waybar.service.d').exists()
+    assert (service_backup / '.config/systemd/user/waybar.service.d/override.conf').is_file()
+    assert not (units / 'waybar-watchdog.service').exists()
+    assert not (wants / 'waybar-watchdog.service').exists()
+    assert (service_backup / '.config/systemd/user/graphical-session.target.wants/waybar-watchdog.service').is_symlink()
+    # A drop-in that does not replace ExecStart is harmless and must survive.
+    (units / 'waybar.service.d').mkdir()
+    (units / 'waybar.service.d/env.conf').write_text('[Service]\nEnvironment=MAYA_TEST=1\n')
+    assert archive_conflicts(target, service_backup, units) == []
+    assert (units / 'waybar.service.d/env.conf').is_file()
+    from kool import KITTY_STUB
+    kool_kitty = target / '.config/hypr/UserConfigs/kitty.conf'
+    kool_kitty.write_text(
+        'include ~/.config/hypr/UserConfigs/kitty-themes/Catppuccin-Mocha.conf\n')
+    run('python3', str(root / 'scripts/restore-managed.py'))
+    assert kool_kitty.read_text() == KITTY_STUB
+    assert (target / '.config/kitty/kitty.conf').is_symlink()
     for src in (root / 'color-palette').iterdir():
         installed = target / '.config/maya-theme' / src.name
         assert installed.is_symlink()

@@ -103,10 +103,16 @@ their scripts and applications exist. Otherwise they hide. The network button
 opens NetworkManager's GUI. Original KooL Waybar files are archived in reference/.
 
 `maya-waybar.service` runs the bar; `waybar.service` aliases it so KooL startup
-and refresh use the same instance. The installer and link recovery also patch
-KooL’s dropdown discovery to match only its dedicated terminal class, preventing
-it from hiding another app during login. Original scripts are backed up; upstream
-source trees are not stored here.
+and refresh use the same instance. Systemd also applies `waybar.service.d`
+drop-ins to the aliased target, so the installer archives any legacy `ExecStart`
+override and conflicting `waybar-watchdog.service` instead of silently launching
+KooL's bar. The installer and link recovery also patch KooL’s dropdown discovery
+to match only its dedicated terminal class, preventing it from hiding another app
+during login. KooL's launchers pass `~/.config/hypr/UserConfigs/kitty.conf`
+explicitly; that file is replaced with a small include of `~/.config/kitty/kitty.conf`
+so KooL's Catppuccin include cannot override Maya's colors and notebook background.
+Original scripts and configs are backed up; upstream source trees are not stored
+here.
 
 `maya-dotfiles.path` repairs replaced
 Kitty, Waybar, Rofi, Wofi, SwayNC and Hyprland user-config symlinks. Vendor writes _through_ a symlink

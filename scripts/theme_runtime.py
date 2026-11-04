@@ -186,5 +186,11 @@ def refresh(home):
     if (home / '.local/bin/maya-lock').is_file():
         # This updates only the lockscreen cache, never the desktop image.
         run([str(home / '.local/bin/maya-lock'), '--prepare'])
-    # Reload the bar last: its click handler may be the caller of this command.
-    signal_owned('waybar', 'USR2')
+    # Waybar's reload_style_on_change watches this file and re-reads palette.css.
+    # Do not send SIGUSR2: Waybar 0.15 aborts in its Hyprland IPC destructor
+    # when Client::reset() tears down module child processes.
+    style = home / '.config/waybar/style.css'
+    try:
+        os.utime(style, None)
+    except OSError:
+        pass
