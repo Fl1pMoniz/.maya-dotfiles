@@ -26,6 +26,6 @@ hl.on("hyprland.start", function()
   if overview then overview:close(); hl.exec_cmd("qs -c overview") end
   hl.exec_cmd("vesktop")
   hl.exec_cmd("Telegram")
-  hl.exec_cmd("google-chrome-stable --restore-last-session", { workspace = "1 silent" })
+  hl.exec_cmd("zen-browser", { workspace = "1 silent" })
   hl.exec_cmd("kitty", { workspace = "2 silent" })
 end)
