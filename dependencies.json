@@ -57,7 +57,7 @@
     },
     "rofi-universal": {
       "url": "https://github.com/Fl1pMoniz/rofi-universal.git",
-      "commit": "001674f92532c9566a38f9c55d565b109768d145",
+      "commit": "8ce807e1f56ee1004a361981a926d7173c55ab37",
       "plugin": "libuniversal.so",
       "build": "build/libuniversal.so",
       "launcher": "data/rofi-universal"

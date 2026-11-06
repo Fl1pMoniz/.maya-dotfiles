@@ -39,7 +39,7 @@ See [licensing details](docs/licensing.md) for scope and upstream references.
   (https://github.com/pdonadeo/rofi-web-search, MIT); the mode script is a
   local implementation for Maya's browser and engine configuration.
 - rofi-universal by Fl1pMoniz: https://github.com/Fl1pMoniz/rofi-universal at
-  `001674f92532c9566a38f9c55d565b109768d145`, MIT. The installer builds the
+  `8ce807e1f56ee1004a361981a926d7173c55ab37`, MIT. The installer builds the
   plugin and launcher from the pinned revision; its source tree is not stored in
   this repository. Currency reference data is fetched from Frankfurter.
 
