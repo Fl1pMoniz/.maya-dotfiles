@@ -49,6 +49,20 @@
     "url": "https://github.com/zsh-users/zsh-syntax-highlighting.git",
     "commit": "1d85c692615a25fe2293bdd44b34c217d5d2bf04"
   },
+  "rofi_extensions": {
+    "rofi-calc": {
+      "url": "https://github.com/svenstaro/rofi-calc.git",
+      "commit": "42e67748c7a647526a5d35b0bdf7adcd1f9c3025",
+      "plugin": "libcalc.so"
+    },
+    "rofi-universal": {
+      "url": "https://github.com/Fl1pMoniz/rofi-universal.git",
+      "commit": "001674f92532c9566a38f9c55d565b109768d145",
+      "plugin": "libuniversal.so",
+      "build": "build/libuniversal.so",
+      "launcher": "data/rofi-universal"
+    }
+  },
   "theme_artifacts": {
     "system24": {
       "url": "https://github.com/refact0r/system24",

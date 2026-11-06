@@ -1,0 +1,72 @@
+#!/bin/sh
+# Maya Rofi search: applications, live calculations and web search.
+set -eu
+home=${HOME:?}
+config="$home/.config/rofi/config.rasi"
+web="$home/.config/rofi/scripts/maya-web-search.py"
+plugins="$home/.local/lib/rofi:${XDG_DATA_HOME:-$home/.local/share}/rofi/plugins"
+export ROFI_PLUGIN_PATH="$plugins${ROFI_PLUGIN_PATH:+:$ROFI_PLUGIN_PATH}"
+modes="drun,filebrowser,run,window,web:$web"
+if [ -f "$home/.local/lib/rofi/libcalc.so" ]; then
+    modes="drun,filebrowser,run,window,calc,web:$web"
+fi
+
+calc_binary=
+if [ -x /usr/bin/qalc ]; then
+    calc_binary=/usr/bin/qalc
+elif [ -x "$home/.local/bin/qalc" ]; then
+    calc_binary="$home/.local/bin/qalc"
+elif command -v qalc >/dev/null 2>&1; then
+    calc_binary=qalc
+fi
+
+calc_copy=
+if command -v wl-copy >/dev/null 2>&1; then
+    calc_copy="printf '%s' '{result}' | wl-copy"
+elif command -v xclip >/dev/null 2>&1; then
+    calc_copy="printf '%s' '{result}' | xclip -selection clipboard"
+elif command -v xsel >/dev/null 2>&1; then
+    calc_copy="printf '%s' '{result}' | xsel --clipboard --input"
+fi
+
+action=${1:-apps}
+if [ "$#" -gt 0 ]; then
+    shift
+fi
+
+case "$action" in
+apps)
+    exec rofi -config "$config" -show drun -modi "$modes" \
+        -theme-str 'textbox-title { str: "Applications"; }' "$@"
+    ;;
+calc)
+    if [ -z "$calc_binary" ]; then
+        rofi -config "$config" -e "Install qalculate (qalc) for live calculations."
+        exit 1
+    fi
+    if [ ! -f "$home/.local/lib/rofi/libcalc.so" ]; then
+        rofi -config "$config" -e "Run the Maya installer to build the rofi-calc plugin."
+        exit 1
+    fi
+    rates_stamp="${XDG_CACHE_HOME:-$home/.cache}/maya-dotfiles/qalc-rates"
+    if [ "$(cat "$rates_stamp" 2>/dev/null || true)" != "$(date +%F)" ]; then
+        mkdir -p "${rates_stamp%/*}"
+        ( "$calc_binary" -e -t '1 EUR to USD' >/dev/null 2>&1 &&
+          date +%F >"$rates_stamp" ) &
+    fi
+    if [ -n "$calc_copy" ]; then
+        set -- -calc-command "$calc_copy" "$@"
+    fi
+    exec rofi -config "$config" -show calc -modi calc \
+        -no-show-match -no-sort -no-history -terse \
+        -qalc-binary "$calc_binary" \
+        -theme-str 'textbox-title { str: "Calculator"; }' "$@"
+    ;;
+web)
+    exec rofi -config "$config" -show web -modi "web:$web" \
+        -theme-str 'textbox-title { str: "Web search"; }' "$@"
+    ;;
+*)
+    exec rofi -config "$config" -show "$action" -modi "$modes" "$@"
+    ;;
+esac

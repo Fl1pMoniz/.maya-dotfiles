@@ -1,0 +1,10 @@
+#!/bin/sh
+# Maya wrapper for rofi-universal: add the Maya web-search tab.
+set -eu
+web="$HOME/.config/rofi/scripts/maya-web-search.py"
+extra=${ROFI_UNIVERSAL_EXTRA_MODI:-}
+if [ -f "$web" ]; then
+    extra="${extra:+$extra,}web:$web"
+fi
+export ROFI_UNIVERSAL_EXTRA_MODI="$extra"
+exec "$HOME/.local/bin/rofi-universal" "$@"

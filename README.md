@@ -47,6 +47,12 @@ reference Fedora desktop on **2026-10-18**, not enforced minimum versions.
 
 - Rofi **2.0.0**, with Wayland support (`rofi` on this Fedora setup;
   some distributions name the Wayland package `rofi-wayland`).
+- rofi-universal **1.1.0** — built from the pinned commit in
+  `dependencies.json` by the installer. Super+D uses its native calculator and
+  inline Frankfurter currency conversion. It never invokes qalc.
+- qalc from Qalculate! **5.9.0** — optional for the separate Super+Space
+  `maya-search` calc tab. The installer can build pinned `rofi-calc` and place
+  qalc locally when the Fedora package is unavailable.
 - brightnessctl **0.5.1**
 - WirePlumber **0.5.18** (provides `wpctl`)
 - pavucontrol **6.2**
@@ -96,6 +102,29 @@ Installed configs are linked to `home/`, so edits stay in sync with this repo.
 See the [configuration guide](docs/configuration.md) for file locations,
 customization, shortcuts, and reload instructions.
 
+## Rofi search
+
+**Super+D** opens `maya-universal`, a Maya wrapper around `rofi-universal`. The
+launcher keeps the familiar **universal**, apps, files, term, window, calc and
+web tabs; **universal** is the default tab. Its native calculator, percentages
+and currency conversion work in the unified field. Calculator and percentages
+work offline; currency (`300 eur to USD`) uses cached Frankfurter reference rates
+and never requires qalc. Enter copies calculations and currency results. The
+wrapper adds the Maya web tab, while the calc tab appears when the pinned
+`rofi-calc` extension is installed. It uses the Maya Rofi theme and optional
+`~/.config/rofi-universal/config.ini` settings.
+
+**Super+Space** opens the separate `maya-search` launcher with the familiar
+apps/files/term/window tabs plus its qalc-backed **calc** and **web** tabs. Its
+web tab supports URLs, leading bangs (`!w`, `!yt`, `!gh`, `!ddg`) and
+suggestions with a trailing `!`; edit `~/.config/rofi/web-search.json` to change
+its engine or browser. Use `maya-search calc` or `maya-search web` for the
+dedicated windows.
+
+The installer builds both the pinned rofi-universal plugin and the optional
+rofi-calc extension from `dependencies.json`. A failed optional extension only
+prints a warning; the rest of the desktop still installs.
+
 ## KooL integration and protection
 
 Waybar optionally shows KooL's help, Hyprland layout, settings and blue-light filter buttons when
@@ -139,6 +168,7 @@ python3 tests/check-palette.py
 python3 tests/check-themes.py
 python3 tests/check-mvim-theme.py
 python3 tests/check-vencord-theme.py
+python3 tests/check-rofi.py
 git diff --check
 ```
 

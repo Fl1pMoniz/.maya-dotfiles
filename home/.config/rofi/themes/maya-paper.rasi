@@ -12,6 +12,9 @@ configuration {
     display-run:                "  term";
     display-filebrowser:        "  files";
     display-window:             "  window";
+    display-universal:          "  universal";
+    display-calc:               "  calc";
+    display-web:                "  web";
     drun-display-format:        "{name}";
     window-format:              "{w} · {c} · {t}";
     hover-select:               true;

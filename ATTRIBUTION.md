@@ -31,6 +31,18 @@ See [licensing details](docs/licensing.md) for scope and upstream references.
   no later-version grant is assumed for that source. Original headers and layout
   credit retained. See https://github.com/adi1090x/rofi/blob/master/LICENSE .
 
+- rofi-calc by svenstaro: https://github.com/svenstaro/rofi-calc at
+  `42e67748c7a647526a5d35b0bdf7adcd1f9c3025`, MIT. The installer builds it from
+  source with the revision in dependencies.json; its source tree is not stored
+  in this repository. qalc comes from Qalculate!, GPL-2.0-or-later.
+- Maya's Rofi web-search interaction follows pdonadeo/rofi-web-search
+  (https://github.com/pdonadeo/rofi-web-search, MIT); the mode script is a
+  local implementation for Maya's browser and engine configuration.
+- rofi-universal by Fl1pMoniz: https://github.com/Fl1pMoniz/rofi-universal at
+  `001674f92532c9566a38f9c55d565b109768d145`, MIT. The installer builds the
+  plugin and launcher from the pinned revision; its source tree is not stored in
+  this repository. Currency reference data is fetched from Frankfurter.
+
 - Maya GTK overrides and pastel folder SVG artwork in `styles/` are original
   project assets under GPL-3.0-or-later. GTK uses its installed Adwaita foundation;
   its upstream source is not copied into this repository.

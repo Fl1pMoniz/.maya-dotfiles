@@ -39,6 +39,10 @@ and the [GNU compatibility FAQ](https://www.gnu.org/licenses/gpl-faq.html#WhatDo
   rules, appearance and Lua integration; development dates are recorded in Git.
 - `home/.config/rofi/themes/maya-paper.rasi`: GPLv3-derived layout; preserve its
   KooL and adi1090x credits.
+- `scripts/rofi_extensions.py` builds rofi-calc (MIT) and rofi-universal (MIT)
+  from pinned upstream revisions; compiled plugins, the rofi-universal launcher
+  and the qalc binary are user-local build artifacts, not repository assets.
+  See ATTRIBUTION.md.
 - `home/.config/kitty/kitty-themes/`: retain the included
   [MIT license](../home/.config/kitty/kitty-themes/LICENSE.md) and author notices.
 - Bundled Fantasque Sans Mono and JetBrains Mono fonts: retain each family's

@@ -35,6 +35,10 @@ if a.with_mvim:
     # Run before copying overrides so the saved personal config wins afterward.
     subprocess.run(['bash', str(root / 'bootstrap-mvim.sh'), '--from-installer'], check=True)
 sys.path.insert(0, str(root / 'scripts'))
+if not a.skip_dependencies:
+    from rofi_extensions import install as install_rofi_extensions
+    for warning in install_rofi_extensions(root, home):
+        print(warning, file=sys.stderr)
 from links import backup_root, ensure_link, ensure_managed, save_existing
 from kool import repair_dropdown, repair_kitty_config
 from services import archive_conflicts
